@@ -2,6 +2,8 @@ import express from 'express'
 import mysql from 'mysql2/promise'
 import 'dotenv/config'
 
+//test
+
 const app = express()
 app.get('/', async (req, res) => {
     if (process.env.DBHOST === undefined) {
