@@ -11,10 +11,10 @@ const app = express()
 // express faça o parse do body da requisição para json 
 app.use(express.json())
 //criando uma rota para acesso pelo navegador
-app.get('/', async (req:Request, res:Response) => {
+app.get('/', async (_:Request, res:Response) => {
     res.send('Estoy working!')
 })
-app.get('/produtos', async (req:Request, res:Response) => {
+app.get('/produtos', async (_:Request, res:Response) => {
     const produtos = await db.collection('produtos').find().toArray()
     res.json(produtos)
 })
