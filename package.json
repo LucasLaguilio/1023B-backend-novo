@@ -3,17 +3,26 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+<<<<<<< HEAD
     "dev": "tsx watch src/index-mongo.ts",
     "dev:mongo": "tsx watch src/index-mongo.ts",
     "build": "npm install && tsc",
     "start": "node dist/index-mongo.js",
     "test": "jest --watch"
+=======
+    "dev": "tsx watch src/index.ts",
+    "dev:mongo": "tsx watch src/index-mongo.ts",
+    "build": "npm install && tsc ",
+    "start": "node dist/index-mongo.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+>>>>>>> 5c061873aab0e755a4d269c13383c7e05421997d
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "type": "module",
   "dependencies": {
+<<<<<<< HEAD
     "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
     "bson": "^6.10.4",
@@ -21,12 +30,22 @@
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+=======
+    "@types/mongodb": "^4.0.6",
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+>>>>>>> 5c061873aab0e755a4d269c13383c7e05421997d
     "mongodb": "^6.19.0",
     "mysql2": "^3.14.3"
   },
   "devDependencies": {
+<<<<<<< HEAD
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
+=======
+    "@types/bcryptjs": "^2.4.6",
+>>>>>>> 5c061873aab0e755a4d269c13383c7e05421997d
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",

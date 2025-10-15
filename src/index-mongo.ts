@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import express, { Request, Response, NextFunction } from 'express'
 import 'dotenv/config'
 import rotasNaoAutenticadas from './rotas/rotas-nao-autenticadas.js'
@@ -14,6 +15,22 @@ app.use(express.json())
 app.use(rotasNaoAutenticadas)
 app.use(Auth)
 app.use(rotasAutenticadas)
+=======
+import express, { Request, Response } from 'express'
+import 'dotenv/config'
+import rotas from './rotas'
+
+const app = express()
+//Esse middleware faz com que o 
+// express faça o parse do body da requisição para json 
+app.use(express.json())
+//criando uma rota para acesso pelo navegador
+app.get('/', async (_:Request, res:Response) => {
+    res.send('Estoy working!')
+})
+
+app.use(rotas)
+>>>>>>> 5c061873aab0e755a4d269c13383c7e05421997d
 
 // Criando o servidor na porta 8000 com o express
 app.listen(8000, () => {
