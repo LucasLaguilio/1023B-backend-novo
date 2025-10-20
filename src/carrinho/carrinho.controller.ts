@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 //import aqui as dependências necessárias
+
 import { ObjectId } from "bson";
 import { db } from "../database/banco-mongo.js";
 
@@ -16,11 +17,20 @@ interface Carrinho {
     dataAtualizacao: Date;
     total: number;
 }
+
+interface AutenticacaoRequest extends Request {
+    usuarioId?:string;
+}
+
 class CarrinhoController {
     //adicionarItem
-    async adicionarItem(req:Request, res:Response) {
+    async adicionarItem(req:AutenticacaoRequest, res:Response) {
         console.log("Chegou na rota de adicionar item ao carrinho");
-        const { usuarioId, produtoId, quantidade } = req.body;
+        const { produtoId, quantidade } = req.body;
+        const usuarioId = req.usuarioId;
+        if (!usuarioId) {
+            return res.status(401).json({ message: "Usuário não autenticado" });
+        }
          //Buscar o produto no banco de dados
         const produto = await db.collection("produtos").findOne({ _id: ObjectId.createFromHexString(produtoId)});
         if (!produto) {
