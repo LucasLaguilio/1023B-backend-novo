@@ -1,14 +1,15 @@
 import {Router} from 'express'
 
 // Update the import path if the file is named differently or located elsewhere
-import carrinhoController from './carrinho/carrinho.controller'
-import produtoController from './produtos/produtos.controller'
-import usuarioController from './usuarios/usuarios.controller'
+import carrinhoController from './carrinho/carrinho.controller.js'
+import produtoController from './produtos/produtos.controller.js'
+import usuarioController from './usuarios/usuarios.controller.js'
 const rotas = Router()
 
 // Rotas do Carrinho
 rotas.get('/carrinho',carrinhoController.listar)
-rotas.post('/carrinho',carrinhoController.adicionar)
+rotas.post('/carrinho', (carrinhoController as any).adicionar)
+
 
 // Rotas dos Produtos
 rotas.get('/produtos',produtoController.listar)

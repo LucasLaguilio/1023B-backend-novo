@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { Request, Response } from "express";
 //import aqui as dependências necessárias
 import { ObjectId } from "bson";
@@ -149,16 +148,3 @@ class CarrinhoController {
     }
 }
 export default new CarrinhoController();
-=======
-import { Request, Response } from 'express'
-class CarrinhoController{
-    adicionar(req:Request, res:Response) {
-        res.status(201)
-    }
-    listar(req:Request, res:Response) {
-        res.status(200)
-    }
-}
-
-export default new CarrinhoController()
->>>>>>> 5c061873aab0e755a4d269c13383c7e05421997d
