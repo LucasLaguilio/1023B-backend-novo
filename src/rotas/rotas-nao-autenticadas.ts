@@ -11,4 +11,5 @@ rotas.post('/adicionarusuario',usuariosController.adicionar)
 rotas.post('/login',usuariosController.login)
 
 
+
 export default rotas
