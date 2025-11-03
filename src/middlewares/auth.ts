@@ -1,4 +1,4 @@
-//Criar um middleware que bloqueia tudo
+
 import jwt from 'jsonwebtoken'
 import { Request, Response, NextFunction } from "express";
 interface AutenticacaoRequest extends Request {
