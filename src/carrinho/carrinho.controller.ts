@@ -1,8 +1,15 @@
+// CarrinhoController.ts
+
 import { Request, Response } from "express";
-import { ObjectId } from "bson";
+import { ObjectId } from "mongodb";
 import { db } from "../database/banco-mongo.js";
 
-// Interfaces
+// Importando a interface de autenticação (assumindo que está em Auth.ts)
+// Nota: Seu projeto deve garantir que esta interface inclua o 'usuarioId'
+interface AutenticacaoRequest extends Request {
+    usuarioId?: string;
+}
+
 interface ItemCarrinho {
     produtoId: string;
     quantidade: number;
@@ -20,12 +27,9 @@ interface Carrinho {
     total: number;
 }
 
-interface AutenticacaoRequest extends Request {
-    usuarioId?: string;
-}
 
 class CarrinhoController {
-    // ADICIONAR ITEM
+    
     async adicionarItem(req: AutenticacaoRequest, res: Response) {
         const { produtoId, quantidade } = req.body;
         const usuarioId = req.usuarioId;
@@ -38,24 +42,24 @@ class CarrinhoController {
             return res.status(400).json({ message: "Dados do item inválidos" });
         }
         
-        // Buscar o produto no banco de dados
+        
         const produto = await db.collection("produtos").findOne({ _id: new ObjectId(produtoId) });
         
         if (!produto) {
             return res.status(400).json({ message: "Produto não encontrado" });
         }
         
-        // Extrair dados do produto
+        
         const precoUnitario = produto.preco;
         const nome = produto.nome;
         const urlfoto = produto.urlfoto || '';
         const descricao = produto.descricao || '';
         
-        // Buscar carrinho existente
+    
         const carrinho = await db.collection<Carrinho>("Carrinho").findOne({ usuarioId: usuarioId });
         
         if (!carrinho) {
-            // Criar novo carrinho
+        
             const novoCarrinho: Carrinho = {
                 usuarioId: usuarioId,
                 itens: [{
@@ -112,7 +116,7 @@ class CarrinhoController {
         return res.status(200).json(carrinho);
     }
 
-    // REMOVER ITEM
+    
     async removerItem(req: AutenticacaoRequest, res: Response) {
         const { produtoId } = req.body;
         const usuarioId = req.usuarioId;
@@ -133,10 +137,10 @@ class CarrinhoController {
             return res.status(404).json({ message: "Item não encontrado no carrinho" });
         }
         
-        // Remover o item
+        
         carrinho.itens.splice(itemIndex, 1);
         
-        // Recalcular total
+        
         carrinho.total = carrinho.itens.reduce((acc, item) => 
             acc + (item.precoUnitario * item.quantidade), 0
         );
@@ -155,8 +159,64 @@ class CarrinhoController {
         
         return res.status(200).json(carrinho);
     }
+
+    // Sheron: Função para remover uma unidade de um item do carrinho
+        async removerunidadeItem(req: AutenticacaoRequest, res: Response) {
+            const { produtoId } = req.body;
+            const usuarioId = req.usuarioId;
     
-    // ATUALIZAR QUANTIDADE
+            if (!usuarioId) {
+                return res.status(401).json({ message: "Usuário não autenticado" });
+            }
+    
+            const carrinho = await db.collection<Carrinho>("Carrinho").findOne({ usuarioId: usuarioId });
+    
+            if (!carrinho) {
+                return res.status(404).json({ message: "Carrinho não encontrado" });
+            }
+    
+            const itemIndex = carrinho.itens.findIndex(item => item.produtoId === produtoId);
+            if (itemIndex === -1) {
+                return res.status(404).json({ message: "Item não encontrado no carrinho" });
+            }
+    
+            const item = carrinho.itens[itemIndex];
+            if (!item) {
+                // defensive check to satisfy TypeScript's strict null checks
+                return res.status(404).json({ message: "Item não encontrado no carrinho" });
+            }
+            
+            if (item.quantidade > 1) {
+                // Decrementa a unidade
+                item.quantidade -= 1;
+            } else if (item.quantidade === 1) {
+                // Se for 1, remove o item da lista
+                carrinho.itens.splice(itemIndex, 1);
+            } else {
+                return res.status(400).json({ message: "Quantidade inválida para remoção" });
+            }
+    
+            // Recalcular total e data
+            carrinho.total = carrinho.itens.reduce((acc, currentItem) => 
+                acc + (currentItem.precoUnitario * currentItem.quantidade), 0
+            );
+            carrinho.dataAtualizacao = new Date();
+    
+            // Salvar no Banco de Dados
+            await db.collection("Carrinho").updateOne(
+                { usuarioId: usuarioId },
+                { 
+                    $set: { 
+                        itens: carrinho.itens, 
+                        total: carrinho.total, 
+                        dataAtualizacao: carrinho.dataAtualizacao 
+                    } 
+                }
+            );
+    
+            return res.status(200).json(carrinho);
+        }
+
     async atualizarQuantidade(req: AutenticacaoRequest, res: Response) {
         const { produtoId, quantidade } = req.body;
         const usuarioId = req.usuarioId;
@@ -181,10 +241,10 @@ class CarrinhoController {
             return res.status(404).json({ message: "Item não encontrado no carrinho" });
         }
         
-        // Atualizar quantidade
+        
         item.quantidade = quantidade;
         
-        // Recalcular total
+        
         carrinho.total = carrinho.itens.reduce((acc, item) => 
             acc + (item.precoUnitario * item.quantidade), 0
         );
@@ -204,7 +264,7 @@ class CarrinhoController {
         return res.status(200).json(carrinho);
     }
     
-    // LISTAR CARRINHO
+    
     async listar(req: AutenticacaoRequest, res: Response) {
         const usuarioId = req.usuarioId;
 
@@ -215,7 +275,7 @@ class CarrinhoController {
         const carrinho = await db.collection<Carrinho>("Carrinho").findOne({ usuarioId: usuarioId });
         
         if (!carrinho) {
-            // Retorna carrinho vazio se não existir
+            
             return res.status(200).json({ 
                 usuarioId: usuarioId, 
                 itens: [], 
@@ -224,7 +284,8 @@ class CarrinhoController {
             });
         }
         
-        // Enriquecer os itens com urlfoto e descricao se estiverem faltando
+
+        // Otimização: Apenas atualiza dados de exibição se estiverem faltando (mas não salva no DB)
         for (const item of carrinho.itens) {
             if (!item.urlfoto || !item.descricao) {
                 const produto = await db.collection("produtos").findOne({ 
@@ -241,7 +302,7 @@ class CarrinhoController {
         return res.status(200).json(carrinho);
     }
     
-    // REMOVER CARRINHO COMPLETO
+
     async remover(req: AutenticacaoRequest, res: Response) {
         const usuarioId = req.usuarioId;
 
