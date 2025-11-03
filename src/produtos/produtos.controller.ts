@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { db } from '../database/banco-mongo.js'
+import { ObjectId } from "mongodb";
 
 class ProdutoController{
     async adicionar(req:Request, res:Response) {
@@ -11,12 +12,5 @@ class ProdutoController{
    const produto = {nome,preco,urlfoto,descricao}
    const result = await db.collection('produtos').insertOne(produto)
     res.status(201).json({nome, preco, urlfoto, descricao, _id:result.insertedId})
-
-    }
-    async listar(_req:Request, res:Response) {
-         const produtos = await db.collection('produtos').find().toArray()
-         res.status(200).json(produtos)
     }
 }
-
-export default new ProdutoController()

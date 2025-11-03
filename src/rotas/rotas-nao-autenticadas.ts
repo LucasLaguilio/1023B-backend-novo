@@ -1,15 +1,10 @@
-import {Router} from 'express'
+import { Router } from 'express';
+import usuariosController from '../usuarios/usuarios.controller.js';
 
-import produtosController from '../produtos/produtos.controller.js'
-import usuariosController from '../usuarios/usuarios.controller.js'
-
-const rotas = Router()
+const rotas = Router();
 
 
+rotas.post('/adicionarusuario', usuariosController.adicionar);
+rotas.post('/login', usuariosController.login);
 
-rotas.post('/adicionarusuario',usuariosController.adicionar)
-rotas.post('/login',usuariosController.login)
-
-
-
-export default rotas
+export default rotas;

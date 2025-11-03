@@ -1,30 +1,32 @@
-//Criar um middleware que bloqueia tudo
-import jwt from 'jsonwebtoken'
 import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+
+interface TokenPayload {
+  usuarioId: string;
+  cargo: string;
+}
+
 interface AutenticacaoRequest extends Request {
-    usuarioId?:string;
+  usuarioId?: string;
+  cargo?: string;
 }
 
-function Auth(req:AutenticacaoRequest,res:Response,next:NextFunction){
-    console.log("Cheguei no middleware")
-    const authHeaders = req.headers.authorization
-    console.log(authHeaders)
-    if(!authHeaders)
-        return res.status(401).json({mensagem:"Você não passou o token no Bearer"})
-    const token = authHeaders.split(" ")[1]!
+export function Auth(req: AutenticacaoRequest, res: Response, next: NextFunction) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ mensagem: "Token não fornecido" });
 
-    jwt.verify(token,process.env.JWT_SECRET!,(err,decoded)=>{
-        if(err){
-            console.log(err)
-            return res.status(401).json({mensagem:"Middleware erro token"})
-        }
-        if(typeof decoded ==="string"||!decoded||!("usuarioId" in decoded)){
-            return res.status(401).json({mensagem:"Middleware erro decoded"})
-        }
-        req.usuarioId = decoded.usuarioId
-        next()
-    })
+  const token = authHeader.split(" ")[1];
+  if (!token) return res.status(401).json({ mensagem: "Token mal formado" });
 
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload;
+
+    req.usuarioId = decoded.usuarioId;
+    req.cargo = decoded.cargo;
+
+    next(); // usuário autenticado
+  } catch (err) {
+    console.error(err);
+    return res.status(401).json({ mensagem: "Token inválido" });
+  }
 }
-
-export default Auth;
