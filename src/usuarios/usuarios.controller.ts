@@ -28,8 +28,7 @@ class UsuariosController {
 
     async listar(req: Request, res: Response) {
         const usuarios = await db.collection('usuarios').find().toArray();
-        const usuariosSemSenha = usuarios.map(({ senha, ...resto }) => resto);
-        res.status(200).json(usuariosSemSenha);
+        res.status(200).json(usuarios);
     }
 
     async login(req: Request, res: Response) {
