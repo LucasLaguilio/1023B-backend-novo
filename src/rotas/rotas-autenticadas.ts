@@ -28,4 +28,14 @@ rotas.get('/carrinho', Auth, carrinhoController.listar)
 // Limpar o carrinho (remover)
 rotas.delete('/carrinho', Auth, carrinhoController.remover)
 
-export default rotas
+
+rotas.post("/produtos", produtosController.adicionar);
+rotas.get("/produtos", produtosController.listar);
+
+
+rotas.post("/adicionarItem", carrinhoController.adicionarItem);
+rotas.post("/removerItem", carrinhoController.removerItem);
+rotas.get("/carrinho/:usuarioId", carrinhoController.listar);
+rotas.delete("/carrinho/:usuarioId", carrinhoController.remover);
+
+export default rotas;
