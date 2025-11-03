@@ -14,5 +14,3 @@ async function listarTodos(req, res) {
 }
 
 export default { listarTodos };
-
-

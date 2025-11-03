@@ -1,32 +1,54 @@
+import jwt from 'jsonwebtoken'
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
 
-interface TokenPayload {
-  usuarioId: string;
-  cargo: string;
-}
 
 interface AutenticacaoRequest extends Request {
-  usuarioId?: string;
-  cargo?: string;
+    usuarioId?: string;
+    tipo?: string; 
 }
 
-export function Auth(req: AutenticacaoRequest, res: Response, next: NextFunction) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ mensagem: "Token não fornecido" });
-
-  const token = authHeader.split(" ")[1];
-  if (!token) return res.status(401).json({ mensagem: "Token mal formado" });
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload;
-
-    req.usuarioId = decoded.usuarioId;
-    req.cargo = decoded.cargo;
-
-    next(); // usuário autenticado
-  } catch (err) {
-    console.error(err);
-    return res.status(401).json({ mensagem: "Token inválido" });
-  }
+interface JwtPayload {
+    usuarioId: string;
+    tipo: string; // Esperamos que o 'tipo' esteja presente
 }
+
+function Auth(req: AutenticacaoRequest, res: Response, next: NextFunction) {
+    console.log("Cheguei no middleware de Autenticação")
+    const authHeaders = req.headers.authorization
+    console.log(authHeaders)
+
+    if (!authHeaders)
+        return res.status(401).json({ mensagem: "Você não passou o token no Bearer" })
+
+    // Verifica se o formato é "Bearer <token>"
+    if (!authHeaders.startsWith("Bearer "))
+        return res.status(401).json({ mensagem: "Formato do token inválido (esperado: Bearer <token>)" })
+
+    const token = authHeaders.split(" ")[1]!
+
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+        return res.status(500).json({ mensagem: "JWT_SECRET não definido no ambiente" });
+    }
+
+    jwt.verify(token, jwtSecret, (err, decoded) => {
+        if (err) {
+            console.log(err)
+            return res.status(401).json({ mensagem: "Middleware erro token" })
+        }
+
+        // Verificação e atribuição
+        if (typeof decoded === "string" || !decoded || !("usuarioId" in decoded) || !("tipo" in decoded)) {
+            return res.status(401).json({ mensagem: "Middleware erro decoded: campos 'usuarioId' ou 'tipo' ausentes." })
+        }
+
+        const payload = decoded as JwtPayload;
+
+        req.usuarioId = payload.usuarioId
+        req.tipo = payload.tipo // **IMPORTANTE: Atribui o tipo à requisição**
+        next()
+    })
+}
+
+export default  Auth;
+export type { AutenticacaoRequest }; // Exporta ambos, Auth e AutenticacaoRequest
