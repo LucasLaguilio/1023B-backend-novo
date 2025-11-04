@@ -13,7 +13,6 @@ rotas.post('/produtos', Auth, AuthAdmin, produtosController.adicionar)
 // Rota de listagem de produtos: Não requer autenticação/autorização (público)
 rotas.get('/produtos', produtosController.listar)
 
-
 // --- Rotas do Carrinho: Requerem APENAS Autenticação (Qualquer usuário logado pode usar) ---
 
 // Adicionar um item ao carrinho
@@ -28,14 +27,18 @@ rotas.get('/carrinho', Auth, carrinhoController.listar)
 // Limpar o carrinho (remover)
 rotas.delete('/carrinho', Auth, carrinhoController.remover)
 
-
+// Mantendo suas rotas duplicadas (conforme solicitado)
 rotas.post("/produtos", produtosController.adicionar);
 rotas.get("/produtos", produtosController.listar);
 
-
+// Mantendo suas rotas de carrinho duplicadas/alternativas (conforme solicitado)
 rotas.post("/adicionarItem", carrinhoController.adicionarItem);
 rotas.post("/removerItem", carrinhoController.removerItem);
 rotas.get("/carrinho/:usuarioId", carrinhoController.listar);
 rotas.delete("/carrinho/:usuarioId", carrinhoController.remover);
+
+// ✨ NOVA ROTA DE BUSCA (PÚBLICA) ✨
+rotas.get('/produtos/buscar', produtosController.buscar);
+
 
 export default rotas;
