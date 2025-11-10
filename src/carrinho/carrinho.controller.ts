@@ -156,7 +156,7 @@ class CarrinhoController {
         return res.status(200).json(carrinho);
     }
 
-    // Sheron: Função para remover uma unidade de um item do carrinho
+
         async removerunidadeItem(req: AutenticacaoRequest, res: Response) {
             const { produtoId } = req.body;
             const usuarioId = req.usuarioId;
@@ -262,7 +262,7 @@ class CarrinhoController {
     
     
     async listar(req: AutenticacaoRequest, res: Response) {
-        const usuarioId = req.usuarioId;
+        const usuarioId = req.usuarioId;    
 
         if (!usuarioId) {
             return res.status(401).json({ message: "Usuário não autenticado" });
@@ -279,7 +279,7 @@ class CarrinhoController {
                 total: 0 
             });
         }
-        
+             
 
         // Otimização: Apenas atualiza dados de exibição se estiverem faltando (mas não salva no DB)
         for (const item of carrinho.itens) {

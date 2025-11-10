@@ -21,6 +21,7 @@ rotas.get("/carrinho/:usuarioId", carrinhoController.listar);
 rotas.delete("/carrinho/:usuarioId", carrinhoController.remover);
 
 
+
 rotas.get("/usuarios", Auth, AuthAdmin, usuariosController.listar); // Apenas admins podem listar usuários
 
 export default rotas;
