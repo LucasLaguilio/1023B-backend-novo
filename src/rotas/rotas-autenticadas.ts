@@ -25,5 +25,6 @@ rotas.get("/carrinho/:usuarioId", carrinhoController.listar)
 rotas.delete("/carrinho/:usuarioId", carrinhoController.remover)
 
 rotas.get("/usuarios", Auth, AuthAdmin, usuariosController.listar)
+rotas.post("/logout", Auth, usuariosController.logout)
 
 export default rotas

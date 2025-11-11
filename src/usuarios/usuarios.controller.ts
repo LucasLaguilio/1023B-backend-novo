@@ -66,6 +66,9 @@ class UsuariosController {
             nome: usuario.nome
         });
     }
+    async logout(req: Request, res: Response) {
+        res.status(200).json({ mensagem: "Logout realizado com sucesso!" });
+    }
 }
 
 export default new UsuariosController()
