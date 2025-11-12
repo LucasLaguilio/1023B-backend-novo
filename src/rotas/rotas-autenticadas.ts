@@ -20,6 +20,8 @@ rotas.post('/removerunidadeItem', Auth, carrinhoController.removerunidadeItem)
 rotas.get('/carrinho', Auth, carrinhoController.listar)
 rotas.delete('/carrinho', Auth, carrinhoController.remover)
 
+rotas.get("/admin/carrinhos", Auth, AuthAdmin, carrinhoController.listarTodosCarrinhosAdmin)
+
 rotas.post("/removerItem", carrinhoController.removerItem)
 rotas.get("/carrinho/:usuarioId", carrinhoController.listar)
 rotas.delete("/carrinho/:usuarioId", carrinhoController.remover)

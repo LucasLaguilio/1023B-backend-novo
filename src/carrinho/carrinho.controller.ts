@@ -298,6 +298,47 @@ class CarrinhoController {
         return res.status(200).json(carrinho);
     }
     
+    
+async listarTodosCarrinhosAdmin(req: Request, res: Response) {
+        try {
+            // A pipeline de agregação une a coleção 'Carrinho' com a coleção 'usuarios'.
+            const carrinhosComUsuarios = await db.collection("Carrinho").aggregate([
+                {
+                    $lookup: {
+                        from: "usuarios",        // Nome da coleção a juntar
+                        localField: "usuarioId", // Campo no CarrinhoController (string)
+                        foreignField: "_id",     // Campo correspondente no UsuariosController (ObjectId)
+                        as: "dadosUsuario"       // Nome do array onde os dados unidos serão colocados
+                    }
+                },
+                {
+                    // Desestrutura o array de dadosUsuario (espera-se que seja um único usuário)
+                    $unwind: {
+                        path: "$dadosUsuario",
+                        preserveNullAndEmptyArrays: true // Mantém carrinhos sem usuário correspondente (se houver)
+                    }
+                },
+                {
+                    // Projeta (formata) o resultado final
+                    $project: {
+                        _id: 1,
+                        usuarioId: 1,
+                        itens: 1,
+                        dataAtualizacao: 1,
+                        total: 1,
+                        // Extrai nome e email do usuário unido
+                        usuarioNome: { $ifNull: ["$dadosUsuario.nome", "Usuário Deletado"] },
+                        usuarioEmail: { $ifNull: ["$dadosUsuario.email", "N/A"] },
+                    }
+                }
+            ]).toArray();
+
+            return res.status(200).json(carrinhosComUsuarios);
+        } catch (error) {
+            console.error("Erro ao listar todos os carrinhos (Admin):", error);
+            return res.status(500).json({ message: "Erro interno do servidor." });
+        }
+    }
 
     async remover(req: AutenticacaoRequest, res: Response) {
         const usuarioId = req.usuarioId;
